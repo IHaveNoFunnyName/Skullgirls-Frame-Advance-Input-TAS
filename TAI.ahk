@@ -7,31 +7,51 @@ Gui, InputWindow:New,, Wau
 Gui, Add, Button, gAirdash, Airdash
 Gui, Show
 
-Airdash()
-{
+MacroInput := [["w"],["j","k"]]
+MacroInput[15] := ["l"]
+global Macro := SparseToRich(MacroInput)
+
+Airdash() {
     Start()
-    ControlSend,,{w down}{d down}, Skullgirls
-    FrameAdvance()
-    ControlSend,,{w up}{d up}, Skullgirls
-    FrameAdvance()
-    ControlSend,,{d down}, Skullgirls
-    FrameAdvance()
-    ControlSend,,{d up}, Skullgirls 
+    for index, element in Macro {
+        DoInput(element) 
+    }
     Start()
     return
 }
-FrameAdvance()
-{
+
+DoInput(array) {
+    for index, key in array {
+        ControlSend,,{%key% down}, Skullgirls
+    }
+    FrameAdvance()
+    for index, key in array {
+        ControlSend,,{%key% up}, Skullgirls
+    } 
+}
+
+FrameAdvance() {
     ControlSend,,{- down}, Skullgirls
     Sleep 17    
     ControlSend,,{- up}, Skullgirls
     return
 }
 
-Start()
-{
+Start() {
     ControlSend,,{0 down}, Skullgirls
     Sleep 17
     ControlSend,,{0 up}, Skullgirls
     return
+}
+
+SparseToRich(sparse) {
+    rich := []
+    Loop % sparse.MaxIndex() {
+        if sparse.HasKey(A_index) {
+            rich[A_index] := sparse[A_index]
+        } else {
+            rich[A_index] := []
+        }
+    }
+    return rich
 }
