@@ -3,8 +3,8 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 
-Gui, InputWindow:New,, Wau
-Gui, Add, Button, gAirdash, Airdash
+Gui, InputWindow:New,, Tool Assisted Inputs
+Gui, Add, Button, gPlay, Play
 Gui, Show
 
 MacroInput := Array()
@@ -18,7 +18,7 @@ Loop, Read, %A_ScriptDir%\input.txt
 }
 global Macro := SparseToRich(MacroInput)
 
-Airdash() {
+Play() {
     Start()
     for index, element in Macro {
         DoInput(element) 
