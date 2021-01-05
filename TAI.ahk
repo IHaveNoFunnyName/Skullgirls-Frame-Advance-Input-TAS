@@ -7,8 +7,15 @@ Gui, InputWindow:New,, Wau
 Gui, Add, Button, gAirdash, Airdash
 Gui, Show
 
-MacroInput := [["w"],["j","k"]]
-MacroInput[15] := ["l"]
+MacroInput := Array()
+Loop, Read, %A_ScriptDir%\input.txt
+{
+    line := A_LoopReadLine
+    split := StrSplit(line, " ")
+    index := split[1]
+    inputs := StrSplit(split[2])
+    MacroInput[index] := inputs
+}
 global Macro := SparseToRich(MacroInput)
 
 Airdash() {
