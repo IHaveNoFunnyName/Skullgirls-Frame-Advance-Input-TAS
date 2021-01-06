@@ -13,8 +13,13 @@ Loop, Read, %A_ScriptDir%\input.txt
     line := A_LoopReadLine
     split := StrSplit(line, " ")
     index := split[1]
-    inputs := StrSplit(split[2])
+    inputs := {"length": split[2], "keys": StrSplit(split[3])}
     MacroInput[index] := inputs
+    dindex := RegExReplace(index, "\D")
+    if (dindex != index)
+    {
+        MacroInput[dindex] := []    
+    }
 }
 global Macro := SparseToRich(MacroInput)
 
@@ -54,10 +59,25 @@ Start() {
 SparseToRich(sparse) {
     rich := []
     Loop % sparse.MaxIndex() {
-        if sparse.HasKey(A_index) {
-            rich[A_index] := sparse[A_index]
-        } else {
-            rich[A_index] := []
+        rich[A_index] := []
+    }
+    for index, element in sparse
+    {
+        if element.Length
+        {
+            dindex := RegExReplace(index, "\D")
+            length := element["length"]
+            keys := element["keys"]
+            i := 0
+            while i < length
+            {
+                rindex := dindex + i
+                if (!rich.HasKey(rindex)) {
+                    rich[rindex] := []
+                }
+                rich[rindex].Push(keys*)
+                i++
+            }
         }
     }
     return rich
