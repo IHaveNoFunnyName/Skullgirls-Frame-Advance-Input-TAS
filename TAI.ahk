@@ -8,10 +8,15 @@ Gui, InputWindow:New,, Tool Assisted Inputs
 Gui, Add, Button, gPlay, Play
 Gui, Show
 
-global delay1 := 30
-global delay2 := 30
+global mdelay1 := 10
+global mdelay2 := 30
+global isdelay1 := 0
+global isdelay2 := 0
+global delay1 := 0
+global delay2 := 0
 global loopindex := 0
-MacroInput := Array()
+global enddelay := 10
+global MacroInput := Array()
 Loop, Read, %A_ScriptDir%\input.txt
 {
     line := A_LoopReadLine
@@ -23,23 +28,30 @@ Loop, Read, %A_ScriptDir%\input.txt
     }
     dindex := RegExReplace(index, "\D")
     if InStr(index, "+") {  
-        MacroInput[dindex + delay1] := []
+        MacroInput[dindex + mdelay1] := []
+        isdelay1 := 1
     }
     if InStr(index, "~") {
-        MacroInput[dindex + delay2] := []
+        MacroInput[dindex + mdelay2] := []
+        isdelay2 := 1
     }
     MacroInput[index] := inputs
 }
-global Macro := SparseToRich(MacroInput)
+global Macro
 
 Play() {
     pToken := Gdip_Startup()
     Start()
-    for index, element in Macro {
-        loopindex := index
-        DoInput(element) 
+    Loop % mdelay1 + 1 {
+        delay1 := A_index - 1
+        FileCreateDir % "./"  delay1
+        Reset()
+        for index, element in Macro {
+            loopindex := index
+            DoInput(element) 
+        }
     }
-    Start()
+    End()
     Gdip_Shutdown(pToken)
     return
 }
@@ -58,10 +70,10 @@ FrameAdvance() {
     ControlSend,,{- down}, Skullgirls
     WinGet, hwnd, ID, Skullgirls
     pBitmap := Gdip_BitmapFromHWND(hwnd)
-    filename := loopindex . ".png"
+    filename := "./" delay1 "/" . loopindex . ".png"
     Gdip_SaveBitmapToFile(pBitmap, filename)
     Gdip_DisposeImage(pBitmap)
-    Sleep 17    
+    Sleep 32
     ControlSend,,{- up}, Skullgirls
     return
 }
@@ -73,9 +85,22 @@ Start() {
     return
 }
 
+End() {
+    Start()
+}
+
+Reset() {
+    ControlSend,,{LCtrl down}, Skullgirls
+    loopindex := 0
+    FrameAdvance()
+    ControlSend,,{LCtrl up}, Skullgirls
+    Macro := SparseToRich(MacroInput)
+    return
+}
+
 SparseToRich(sparse) {
     rich := []
-    Loop % sparse.MaxIndex() {
+    Loop % sparse.MaxIndex() + enddelay {
         rich[A_index] := []
     }
     for index, element in sparse
