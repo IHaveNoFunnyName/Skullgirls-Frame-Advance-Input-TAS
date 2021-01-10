@@ -14,12 +14,10 @@ Loop, Read, %A_ScriptDir%\input.txt
     split := StrSplit(line, " ")
     index := split[1]
     inputs := {"length": split[2], "keys": StrSplit(split[3])}
-    MacroInput[index] := inputs
-    dindex := RegExReplace(index, "\D")
-    if (dindex != index)
-    {
-        MacroInput[dindex] := []    
+    while(MacroInput.HasKey(index)) {
+        index := index "a"
     }
+    MacroInput[index] := inputs
 }
 global Macro := SparseToRich(MacroInput)
 
