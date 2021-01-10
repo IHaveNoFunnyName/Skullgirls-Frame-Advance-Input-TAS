@@ -7,6 +7,8 @@ Gui, InputWindow:New,, Tool Assisted Inputs
 Gui, Add, Button, gPlay, Play
 Gui, Show
 
+global delay1 := 30
+global delay2 := 30
 MacroInput := Array()
 Loop, Read, %A_ScriptDir%\input.txt
 {
@@ -16,6 +18,13 @@ Loop, Read, %A_ScriptDir%\input.txt
     inputs := {"length": split[2], "keys": StrSplit(split[3])}
     while(MacroInput.HasKey(index)) {
         index := index "a"
+    }
+    dindex := RegExReplace(index, "\D")
+    if InStr(index, "+") {  
+        MacroInput[dindex + delay1] := []
+    }
+    if InStr(index, "~") {
+        MacroInput[dindex + delay2] := []
     }
     MacroInput[index] := inputs
 }
@@ -64,6 +73,11 @@ SparseToRich(sparse) {
         if element.Length
         {
             dindex := RegExReplace(index, "\D")
+            if (InStr(index, "+")) {
+                dindex += delay1
+            } else if (InStr(index, "~")) {
+                dindex += delay2
+            }
             length := element["length"]
             keys := element["keys"]
             i := 0
